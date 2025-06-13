@@ -14,7 +14,7 @@ function App() {
 
   return (
     <Routes>
-      {/* Public Route: hanya untuk user yang BELUM login */}
+      {/* Public Route: only accessible to users who are NOT logged in */}
       <Route
         element={
           isAuthenticated ? (
@@ -30,7 +30,7 @@ function App() {
         <Route path="/auth" element={<AuthPage />} />
       </Route>
 
-      {/* Private Route: hanya untuk user yang SUDAH login */}
+      {/* Private Route: only accessible to users who are logged in */}
       <Route
         path="/articles"
         element={

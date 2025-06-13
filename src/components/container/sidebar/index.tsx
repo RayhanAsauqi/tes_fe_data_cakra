@@ -2,16 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import {
-  Users,
-  Settings,
-  BarChart2,
-  FileText,
-  Menu,
-  X,
-  MessageCircle,
-  Newspaper,
-} from "lucide-react";
+import { Users, Menu, X, MessageCircle, Newspaper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
@@ -34,21 +25,6 @@ const sidebarItems: SidebarItem[] = [
     icon: MessageCircle,
     label: "Comments",
     href: "/articles/comments",
-  },
-  {
-    icon: FileText,
-    label: "Reports",
-    href: "/reports",
-  },
-  {
-    icon: BarChart2,
-    label: "Analytics",
-    href: "/analytics",
-  },
-  {
-    icon: Settings,
-    label: "Settings",
-    href: "/settings",
   },
 ];
 

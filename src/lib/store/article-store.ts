@@ -40,10 +40,20 @@ export const useArticleStore = create<ArticleState>((set, get) => ({
             const params = new URLSearchParams({
                 "pagination[page]": page.toString(),
                 "pagination[pageSize]": pageSize.toString(),
+                "populate[comments][populate][user]": "*",
+                "populate[user]": "*",
+                "populate[category]": "*",
                 ...(search && { "filters[title][$contains]": search }),
             });
 
-            const res = await fetch(`${API_URL}/articles?${params.toString()}`);
+            const res = await fetch(
+                `${API_URL}/articles?${params.toString()}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${atob(token)}`,
+                    },
+                }
+            );
 
             if (!res.ok) {
                 throw new Error(`Failed to fetch articles: ${res.status}`);
