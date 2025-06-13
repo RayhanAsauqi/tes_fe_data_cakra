@@ -1,103 +1,129 @@
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { Article } from "@/lib/types/article";
-import { ArrowRight, Calendar } from "lucide-react";
-import { Link } from "react-router-dom";
+"use client";
 
-type ArticleCardProps = {
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MessageSquare, Trash } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import ArticleCommentsModal from "../modal/comment/list-comment";
+import type { Article } from "@/lib/types/article";
+import { useCookies } from "react-cookie";
+import { useDisclosure } from "@/hooks/use-disclosure";
+
+interface ArticleCardProps {
   article?: Article;
   isLoading?: boolean;
   onDelete?: () => void;
-};
+}
 
-export default function ArticleCard(props: ArticleCardProps) {
-  const truncateText = (text: string, maxLength: number = 120): string => {
-    if (!text) return "";
-    return text.length > maxLength
-      ? `${text.substring(0, maxLength)}...`
-      : text;
-  };
-
-  if (props.isLoading || !props.article) {
+export default function ArticleCard({
+  article,
+  isLoading,
+  onDelete,
+}: ArticleCardProps) {
+  const { isOpen, onClose, onOpen } = useDisclosure();
+  const [cookies] = useCookies(["token"]);
+  const isAuthenticated = Boolean(cookies.token);
+  if (isLoading) {
     return (
-      <div className="bg-white rounded-xl overflow-hidden shadow-sm border h-full">
-        <Skeleton className="h-48 w-full rounded-none" />
-
-        <div className="p-6 flex-grow flex flex-col">
-          <Skeleton className="h-4 w-1/2 mb-3" />
-          <Skeleton className="h-6 w-full mb-3" />
+      <Card className="overflow-hidden">
+        <CardHeader className="p-0">
+          <Skeleton className="h-48 w-full" />
+        </CardHeader>
+        <CardContent className="p-4">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2 mb-4" />
           <Skeleton className="h-4 w-full mb-2" />
-          <Skeleton className="h-4 w-full mb-2" />
-          <Skeleton className="h-4 w-3/4 mb-4" />
-
-          <div className="flex justify-between items-center">
-            <Skeleton className="h-8 w-24" />
-          </div>
-        </div>
-      </div>
+          <Skeleton className="h-4 w-full" />
+        </CardContent>
+        <CardFooter className="p-4 pt-0 flex justify-between">
+          <Skeleton className="h-4 w-1/3" />
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </CardFooter>
+      </Card>
     );
   }
 
+  if (!article) return null;
+
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-sm border hover:shadow-md transition-all duration-300  h-full group  ">
-      <div className="relative h-48 w-full overflow-hidden">
-        {props.article.cover_image_url ? (
-          <img
-            src={props.article.cover_image_url || "/placeholder.svg"}
-            alt={props.article.title}
-            className="aspect-video transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="h-full w-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
-            <span className="text-white text-lg font-medium">
-              {props.article.title.charAt(0)}
-            </span>
-          </div>
-        )}
+    <Card className="overflow-hidden">
+      <div className="bg-white rounded-t-xl overflow-hidden shadow-sm border hover:shadow-md transition-all duration-300  h-full group ">
+        <div className="relative h-48 w-full overflow-hidden">
+          {article.cover_image_url ? (
+            <img
+              src={article.cover_image_url || "/placeholder.svg"}
+              alt={article.title}
+              className="aspect-video transition-transform duration-500 group-hover:scale-105 "
+            />
+          ) : (
+            <div className="h-48 w-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
+              <span className="text-white text-lg font-medium">
+                {article.title.charAt(0)}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="p-6 flex-grow flex flex-col">
-        <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
-          <span className="flex items-center gap-1">
-            <Calendar className="h-3 w-3" />
-
-            {new Date(props.article.publishedAt).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
+      <CardContent className="">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="font-semibold line-clamp-1">{article.title}</h3>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+          <span>{article.user.username}</span>
+          <span>•</span>
+          <span>
+            {new Date(article.createdAt).toLocaleDateString("en-US", {
               year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
           </span>
         </div>
-
-        <h2 className="text-xl font-bold mb-3 line-clamp-2 group-hover:text-purple-700 transition-colors">
-          {props.article.title}
-        </h2>
-
-        <p className="text-gray-600 mb-4 line-clamp-3">
-          {truncateText(props.article.description) ||
-            "No description available"}
+        <p className="text-sm text-muted-foreground line-clamp-2">
+          {article.description || "No description provided."}
         </p>
-
-        <div className="flex justify-between items-center">
+      </CardContent>
+      <CardFooter className="p-4 pt-0 flex justify-between">
+        <div className="text-xs px-2 py-1 bg-muted rounded-full">
+          {article.category?.name || "Uncategorized"}
+        </div>
+        <div className="flex items-center gap-2">
           <Button
-            asChild
             variant="ghost"
             size="sm"
-            className="text-purple-700 hover:text-purple-800 hover:bg-purple-50 p-0 group"
+            className="flex items-center gap-1"
+            onClick={onOpen}
           >
-            <Link
-              to={`/blog/${props.article.id}`}
-              className="flex items-center gap-1"
-            >
-              Read more
-              <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-            </Link>
+            <MessageSquare className="h-4 w-4" />
+            <span>{article.comments.length}</span>
           </Button>
-          <Button className="bg-slate-800" onClick={props.onDelete}>
-            Delete
+          <Button
+            variant="destructive"
+            size="icon"
+            className="h-8 w-8"
+            onClick={onDelete}
+          >
+            <Trash className="h-4 w-4" />
           </Button>
+          <ArticleCommentsModal
+            article={{
+              id: article.id,
+              title: article.title,
+              comments: article.comments,
+            }}
+            isLoggedIn={isAuthenticated}
+            currentUserId={article.user.id}
+            isOpen={isOpen}
+            onClose={onClose}
+          />
         </div>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }

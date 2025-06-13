@@ -35,29 +35,20 @@ export default function ArticlePage() {
     onDeleteOpen();
   };
 
+  useEffect(() => {
+    console.log("Articles fetched:", articles);
+  }, [articles]);
+
   return (
     <DefaultLayout
-      pageTitle="Dashboard"
+      pageTitle="Articles"
       subTitle="Overview of your activities"
       search={{
         placeholder: "Search article by title...",
         value: search,
         onChange: (value) => setSearch(value),
       }}
-      button={
-        // <Link to="/articles/create">
-        //   <Button
-        //     variant="default"
-        //     size="lg"
-        //     className="bg-slate-800"
-        //     disabled={false}
-        //   >
-        //     Add Article
-        //   </Button>
-        // </Link>
-
-        <AddArticleModal />
-      }
+      button={<AddArticleModal />}
     >
       <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
@@ -71,7 +62,12 @@ export default function ArticlePage() {
             {articles.map((article) => (
               <ArticleCard
                 key={article.id}
-                article={article}
+                article={{
+                  ...article,
+                  comments: article.comments ?? [],
+                  user: article.user ?? {},
+                  category: article.category ?? {},
+                }}
                 onDelete={() => handleDelete(article.documentId, article.title)}
               />
             ))}

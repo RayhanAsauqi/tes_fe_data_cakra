@@ -33,7 +33,7 @@ export default function DeleteArticleModal(props: DeleteArticleModalProps) {
 
   return (
     <Dialog open={props.isOpen} onOpenChange={props.setIsOpen}>
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>
             <p className="font-bold">Delete Article</p>
