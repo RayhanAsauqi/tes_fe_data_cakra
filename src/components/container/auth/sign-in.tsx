@@ -1,4 +1,3 @@
-import { useCookies } from "react-cookie";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,12 +25,11 @@ export default function SignInForm() {
       password: "",
     },
   });
-  // const navigate = useNavigate();
-  const [, setCookie] = useCookies(["token"]);
 
   const submitSignIn = async (values: z.infer<typeof SignInFormSchema>) => {
-    await signIn(values, setCookie);
+    await signIn(values);
   };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submitSignIn)} className="space-y-4">
@@ -66,7 +64,11 @@ export default function SignInForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={submitLoading}>
+        <Button
+          type="submit"
+          className="w-full bg-slate-800"
+          disabled={submitLoading}
+        >
           Login
         </Button>
       </form>

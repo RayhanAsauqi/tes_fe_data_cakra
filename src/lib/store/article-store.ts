@@ -6,6 +6,7 @@ import { Cookies } from "react-cookie";
 
 type ArticleState = {
     articles: Article[];
+    selectedArticle?: Article | null;
     loading: boolean;
     error: string | null;
     currentPage: number;
@@ -15,43 +16,54 @@ type ArticleState = {
     fetchArticles: (
         page?: number,
         pageSize?: number,
-        search?: string
+        search?: string,
+        withToken?: boolean
     ) => Promise<void>;
+    fetchArticlesByDocumentId: (documentId: string) => Promise<void>;
 
     createArticle: (data: CreateArticlePayload) => Promise<void>;
     deleteArticle: (documentId: string) => Promise<void>;
 };
 
 const cookies = new Cookies();
-const token = cookies.get("token");
 
 export const useArticleStore = create<ArticleState>((set, get) => ({
     articles: [],
+    selectedArticle: null,
     loading: false,
     error: null,
     currentPage: 1,
     totalPages: 1,
     total: 0,
 
-    fetchArticles: async (page = 1, pageSize = 10, search = "") => {
+    fetchArticles: async (
+        page = 1,
+        pageSize = 10,
+        search = "",
+        withToken = false
+    ) => {
         set({ loading: true, error: null });
 
         try {
+            const token = cookies.get("token");
             const params = new URLSearchParams({
                 "pagination[page]": page.toString(),
                 "pagination[pageSize]": pageSize.toString(),
-                "populate[comments][populate][user]": "*",
-                "populate[user]": "*",
-                "populate[category]": "*",
+                populate: "*",
                 ...(search && { "filters[title][$contains]": search }),
             });
 
+            const headers: HeadersInit = {
+                "Content-Type": "application/json",
+            };
+
+            if (withToken && token) {
+                headers.Authorization = `Bearer ${atob(token)}`;
+            }
             const res = await fetch(
                 `${API_URL}/articles?${params.toString()}`,
                 {
-                    headers: {
-                        Authorization: `Bearer ${atob(token)}`,
-                    },
+                    headers,
                 }
             );
 
@@ -92,8 +104,54 @@ export const useArticleStore = create<ArticleState>((set, get) => ({
         }
     },
 
+    fetchArticlesByDocumentId: async (documentId) => {
+        set({ loading: true, error: null });
+
+        const { articles } = get();
+        const token = cookies.get("token");
+        const matched = articles.find((a) => a.documentId === documentId);
+
+        if (matched) {
+            set({ selectedArticle: matched, loading: false });
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/articles/${documentId}`, {
+                headers: {
+                    Authorization: `Bearer ${atob(token)}`,
+                },
+            });
+
+            if (!res.ok) {
+                throw new Error(`Failed to fetch article: ${res.status}`);
+            }
+
+            const json = await res.json();
+
+            if (!json.data) {
+                throw new Error("Invalid API response structure");
+            }
+
+            set({
+                selectedArticle: json.data,
+                loading: false,
+                error: null,
+            });
+        } catch (error) {
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : "Failed to fetch article";
+
+            set({ loading: false, error: errorMessage });
+            toast.error(errorMessage, { position: "bottom-right" });
+        }
+    },
+
     createArticle: async (data) => {
         set({ loading: true, error: null });
+        const token = cookies.get("token");
 
         try {
             const res = await fetch(`${API_URL}/articles`, {
@@ -131,6 +189,7 @@ export const useArticleStore = create<ArticleState>((set, get) => ({
 
     deleteArticle: async (documentId) => {
         set({ loading: true, error: null });
+        const token = cookies.get("token");
 
         try {
             const res = await fetch(`${API_URL}/articles/${documentId}`, {

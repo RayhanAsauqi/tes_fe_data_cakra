@@ -7,7 +7,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center  py-12 px-4">
       <div className="max-w-md w-full">
-        <Card>
+        <Card className="py-6">
           <CardHeader>
             <CardTitle className="text-2xl text-center">
               Authentication
@@ -24,7 +24,6 @@ export default function AuthPage() {
               </TabsContent>
               <TabsContent value="signup" className="mt-6">
                 <SignUpForm />
-                <h1>tes</h1>
               </TabsContent>
             </Tabs>
           </CardContent>
