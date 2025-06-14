@@ -68,7 +68,9 @@ export default function AddArticleModal() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" className="bg-slate-800 hover:bg-slate-700">Add Article</Button>
+        <Button variant="default" className="bg-slate-800 hover:bg-slate-700">
+          Add Article
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -78,8 +80,9 @@ export default function AddArticleModal() {
 
         <Form {...form}>
           <form
+            id="add-article-form"
             onSubmit={form.handleSubmit(submitForm)}
-            className="space-y-3  max-h-96 overflow-y-auto"
+            className="space-y-3  max-h-96 overflow-y-auto px-2"
           >
             <FormField
               control={form.control}
@@ -167,7 +170,12 @@ export default function AddArticleModal() {
           </form>
         </Form>
         <DialogFooter>
-          <Button type="submit" disabled={submitLoading} className="mt-4">
+          <Button
+            form="add-article-form"
+            type="submit"
+            disabled={submitLoading}
+            className="mt-4 bg-slate-800 hover:bg-slate-700"
+          >
             Submit
           </Button>
         </DialogFooter>
