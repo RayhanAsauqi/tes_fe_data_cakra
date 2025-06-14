@@ -39,7 +39,7 @@ export default function ArticleCard(props: ArticleCardProps) {
   const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
-    onClose: onDeleteClose,
+    setIsOpen: setIsDeleteOpen,
   } = useDisclosure();
   const [cookies] = useCookies(["token"]);
   const isAuthenticated = Boolean(cookies.token);
@@ -49,6 +49,10 @@ export default function ArticleCard(props: ArticleCardProps) {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [commentToDelete, setCommentToDelete] = useState<{
+    commentId: string;
+    title: string;
+  } | null>(null);
 
   const {
     comments,
@@ -373,30 +377,30 @@ export default function ArticleCard(props: ArticleCardProps) {
                                       <Button
                                         variant="ghost"
                                         size="sm"
+                                        onClick={() => {
+                                          setCommentToDelete({
+                                            commentId: comment.documentId,
+                                            title: editingContent,
+                                          });
+                                          onDeleteOpen();
+                                        }}
+                                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                                        disabled={isUpdating}
+                                      >
+                                        <Trash className="h-3 w-3" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
                                         onClick={() =>
                                           handleUpdateComment(
                                             comment.documentId
                                           )
                                         }
-                                        className="h-6 w-6 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 flex-shrink-0"
-                                        disabled={
-                                          isUpdating || !editingContent.trim()
-                                        }
-                                      >
-                                        {isUpdating ? (
-                                          <Loader2 className="h-3 w-3 animate-spin" />
-                                        ) : (
-                                          <Send className="h-3 w-3" />
-                                        )}
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={handleCancelEdit}
-                                        className="h-6 w-6 p-0 text-slate-500 hover:text-slate-700 hover:bg-slate-100 flex-shrink-0"
+                                        className="h-6 w-6 p-0 text-slate-800 hover:text-slate-500 hover:bg-blue-50 flex-shrink-0"
                                         disabled={isUpdating}
                                       >
-                                        ×
+                                        <Send size={40} />
                                       </Button>
                                     </>
                                   ) : (
@@ -414,15 +418,6 @@ export default function ArticleCard(props: ArticleCardProps) {
                                         disabled={commentsLoading}
                                       >
                                         <Pencil className="h-3 w-3" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={onDeleteOpen}
-                                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
-                                        disabled={commentsLoading}
-                                      >
-                                        <Trash className="h-3 w-3" />
                                       </Button>
                                     </>
                                   )}
@@ -456,26 +451,6 @@ export default function ArticleCard(props: ArticleCardProps) {
                               <p className="text-sm text-slate-700 break-words">
                                 {comment.content}
                               </p>
-                            )}
-                            {editingCommentId === comment.documentId && (
-                              <DeleteCommentModal
-                                isOpen={isDeleteOpen}
-                                setIsOpen={onDeleteClose}
-                                data={{
-                                  commentId: comment.documentId,
-                                  title: comment.content ?? "",
-                                }}
-                              />
-                            )}
-                            {editingCommentId !== comment.documentId && (
-                              <DeleteCommentModal
-                                isOpen={isDeleteOpen}
-                                setIsOpen={onDeleteClose}
-                                data={{
-                                  commentId: comment.documentId,
-                                  title: comment.content ?? "",
-                                }}
-                              />
                             )}
                           </div>
                         </div>
@@ -528,6 +503,17 @@ export default function ArticleCard(props: ArticleCardProps) {
           )}
         </div>
       </CardContent>
+
+      {commentToDelete && (
+        <DeleteCommentModal
+          isOpen={isDeleteOpen}
+          setIsOpen={() => {
+            setIsDeleteOpen(true);
+            setCommentToDelete(null);
+          }}
+          data={commentToDelete}
+        />
+      )}
     </Card>
   );
 }
