@@ -32,6 +32,8 @@ export default function ArticlePage() {
   const [debouncedSearch, search, setSearch] = useDebounce("", 800);
 
   useEffect(() => {
+    console.log("🔍 Search query:", debouncedSearch);
+
     fetchArticles(1, 6, debouncedSearch, true);
   }, [debouncedSearch, fetchArticles]);
 
@@ -42,7 +44,7 @@ export default function ArticlePage() {
       search={{
         placeholder: "Search article by title...",
         value: search,
-        onChange: (value) => setSearch(value),
+        onChange: (value) => setSearch(value.trim()),
       }}
       button={
         isAuthenticated ? (
@@ -91,7 +93,7 @@ export default function ArticlePage() {
           totalPages={totalPages}
           pageSize={6}
           total={total}
-          onPageChange={(page) => fetchArticles(page, 6, debouncedSearch)}
+          onPageChange={(page) => fetchArticles(page, 6, debouncedSearch, true)}
         />
       </div>
 

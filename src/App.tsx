@@ -9,38 +9,37 @@ import NotFoundPage from "@/app/not-found";
 import "@/style/global.css";
 import ArticlePage from "@/app/index";
 import { AuthStore } from "./lib/store/auth-store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   const [cookies] = useCookies(["token"]);
   const setIsAuthenticated = AuthStore((state) => state.setIsAuthenticated);
+  const isAuthenticated = AuthStore((state) => state.isAuthenticated);
+  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
     setIsAuthenticated(!!cookies.token);
+    setAuthReady(true);
   }, [cookies.token, setIsAuthenticated]);
-
-  const isAuthenticated = AuthStore((state) => state.isAuthenticated);
+  if (!authReady) {
+    return <div className="p-4">Checking authentication...</div>;
+  }
 
   return (
     <Routes>
-      {/* Main route always accessible */}
       <Route path="/" element={<ArticlePage />} />
 
-      {/* Protected routes */}
       <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
         <Route path="detail/:documentId" element={<ArticleDetailPage />} />
       </Route>
 
-      {/* Auth route - only for unauthenticated users */}
       <Route
         path="/auth"
         element={isAuthenticated ? <Navigate to="/" replace /> : <AuthPage />}
       />
 
-      {/* Fallback route */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
-
 export default App;

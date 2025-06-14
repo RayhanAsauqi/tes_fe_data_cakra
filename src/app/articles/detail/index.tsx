@@ -1,52 +1,37 @@
+import { useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import { ArrowLeft, Calendar, Clock, Globe } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import DefaultLayout from "@/layouts/default";
 import { useArticleStore } from "@/lib/store/article-store";
-import { Calendar, Clock, Globe } from "lucide-react";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { formatDate, formatRelativeTime } from "@/utils/format/date";
 
-function formatDate(dateString?: string) {
-  if (!dateString) return "Unknown date";
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function formatRelativeTime(dateString?: string) {
-  if (!dateString) return "Unknown date";
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInHours = Math.floor(
-    (now.getTime() - date.getTime()) / (1000 * 60 * 60)
-  );
-
-  if (diffInHours < 24) {
-    return `${diffInHours} hours ago`;
-  } else {
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `${diffInDays} days ago`;
-  }
-}
 export default function ArticleDetailPage() {
   const { documentId } = useParams<{ documentId: string }>();
-  const { fetchArticlesByDocumentId, selectedArticle } = useArticleStore();
 
+  const { fetchArticlesByDocumentId, selectedArticle } = useArticleStore();
   useEffect(() => {
     if (documentId) {
       fetchArticlesByDocumentId(documentId);
     }
   }, [documentId, fetchArticlesByDocumentId]);
 
-  console.log(selectedArticle);
-
   return (
     <DefaultLayout pageTitle="Article Detail">
+      <Link to="/">
+        <Button
+          size="lg"
+          className="bg-slate-900 hover:bg-slate-800 text-white group/btn"
+        >
+          <ArrowLeft className="h-4 w-4 ml-1 transition-transform group-hover/btn:-translate-x-1" />
+          <span className="ml-2">Back to Articles</span>
+        </Button>
+      </Link>
       <div className="max-w-4xl mx-auto">
+        <div className="mb-6"></div>
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
             <Badge variant="secondary" className="text-xs">
@@ -65,13 +50,14 @@ export default function ArticleDetailPage() {
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
               <span>
-                Published {formatRelativeTime(selectedArticle?.publishedAt)}
+                Published{" "}
+                {formatRelativeTime(selectedArticle?.publishedAt || "")}
               </span>
             </div>
             <div className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
               <span>
-                Updated {formatRelativeTime(selectedArticle?.updatedAt)}
+                Updated {formatRelativeTime(selectedArticle?.updatedAt || "")}
               </span>
             </div>
             {selectedArticle?.locale && (
@@ -108,7 +94,7 @@ export default function ArticleDetailPage() {
                   Created
                 </h4>
                 <p className="text-sm">
-                  {formatDate(selectedArticle?.createdAt)}
+                  {formatDate(selectedArticle?.createdAt || "")}
                 </p>
               </div>
               <div>
@@ -116,7 +102,7 @@ export default function ArticleDetailPage() {
                   Last Updated
                 </h4>
                 <p className="text-sm">
-                  {formatDate(selectedArticle?.updatedAt)}
+                  {formatDate(selectedArticle?.updatedAt || "")}
                 </p>
               </div>
               <div>
@@ -124,13 +110,12 @@ export default function ArticleDetailPage() {
                   Published
                 </h4>
                 <p className="text-sm">
-                  {formatDate(selectedArticle?.publishedAt)}
+                  {formatDate(selectedArticle?.publishedAt || "")}
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
-        
       </div>
     </DefaultLayout>
   );

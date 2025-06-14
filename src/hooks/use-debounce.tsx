@@ -14,9 +14,7 @@ export default function useDebounce<T>(initialState: T, delay: number = 300) {
       }
 
       timeoutRef.current = setTimeout(() => {
-        setDebounceState(
-          (typeof state === "string" ? (state.toLowerCase() as T) : state)
-        );
+        setDebounceState(state);
         prevState.current = state;
       }, delay);
 

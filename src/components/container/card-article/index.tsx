@@ -1,11 +1,5 @@
-
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
 import {
   ArrowRight,
   Calendar,
@@ -15,20 +9,25 @@ import {
   Send,
   Trash,
 } from "lucide-react";
+import { Link } from "react-router-dom";
+
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import type { Article } from "@/lib/types/article";
-
-import { useEffect, useState } from "react";
 import { useCommentStore } from "@/lib/store/comment-store";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useCookies } from "react-cookie";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/utils/format/date";
 import DeleteCommentModal from "../modal/comment/delete-commet";
 import { useDisclosure } from "@/hooks/use-disclosure";
 import ImageWithFallback from "../image-with-fallback";
-import { Link } from "react-router-dom";
 
 interface ArticleCardProps {
   article?: Article;
@@ -178,8 +177,8 @@ export default function ArticleCard(props: ArticleCardProps) {
         </div>
 
         {isAuthenticated && props.article.user && (
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col md:flex-row items-start gap-5 md:justify-between pb-4 border-b border-slate-100 mb-4">
+            <div className="flex md:flex-row items-center gap-3">
               <Avatar className="h-8 w-8 ring-2 ring-slate-100">
                 <AvatarFallback className="bg-gradient-to-br from-slate-400 to-slate-600 text-white text-xs font-semibold">
                   {userInitial}
@@ -194,13 +193,6 @@ export default function ArticleCard(props: ArticleCardProps) {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                className="bg-slate-900 hover:bg-slate-800 text-white group/btn"
-              >
-                Read More
-                <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover/btn:translate-x-1" />
-              </Button>
               {props.onDelete && (
                 <Button
                   variant="outline"
@@ -214,6 +206,16 @@ export default function ArticleCard(props: ArticleCardProps) {
               <Button variant="outline" size="sm">
                 <Pencil />
               </Button>
+
+              <Link to={`/detail/${props.article.documentId}`}>
+                <Button
+                  size="sm"
+                  className="bg-slate-900 hover:bg-slate-800 text-white group/btn"
+                >
+                  Read More
+                  <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover/btn:translate-x-1" />
+                </Button>
+              </Link>
             </div>
           </div>
         )}
