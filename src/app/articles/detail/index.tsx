@@ -23,7 +23,7 @@ export default function ArticleDetailPage() {
     <DefaultLayout pageTitle="Article Detail">
       <Link to="/">
         <Button
-          size="lg"
+          size="sm"
           className="bg-slate-900 hover:bg-slate-800 text-white group/btn"
         >
           <ArrowLeft className="h-4 w-4 ml-1 transition-transform group-hover/btn:-translate-x-1" />
