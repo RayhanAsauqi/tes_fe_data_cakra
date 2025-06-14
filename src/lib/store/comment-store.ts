@@ -12,6 +12,7 @@ type CommentStore = {
     openCommentsCardId: string | null;
     setComments: (comments: Comment[]) => void;
     fetchComments: (articleId: string) => Promise<void>;
+    updateComment: (commentId: string, content: string) => Promise<void>;
     addComment: (
         content: string,
         articleId: number,
@@ -124,7 +125,49 @@ export const useCommentStore = create<CommentStore>((set, get) => ({
             toast.error("Failed to add comment");
         }
     },
+    updateComment: async (commentId: string, content: string) => {
+        const currentArticleId = get().currentArticleId;
+        set({ loading: true, error: null });
 
+        try {
+            const token = cookies.get("token");
+            const response = await fetch(`${API_URL}/comments/${commentId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${atob(token)}`,
+                },
+                body: JSON.stringify({
+                    data: {
+                        content,
+                    },
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(
+                    errorData.message || "Failed to update comment"
+                );
+            }
+
+            toast.success("Comment updated successfully!");
+
+            if (currentArticleId) {
+                await get().fetchComments(currentArticleId);
+            }
+        } catch (error) {
+            console.error("Error updating comment:", error);
+            set({
+                loading: false,
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to update comment",
+            });
+            toast.error("Failed to update comment");
+        }
+    },
     deleteComment: async (commentId: string) => {
         const currentArticleId = get().currentArticleId;
         set({ loading: true, error: null });
