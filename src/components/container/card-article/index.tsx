@@ -46,6 +46,9 @@ export default function ArticleCard(props: ArticleCardProps) {
   const [showAllComments, setShowAllComments] = useState<boolean>(false);
   const [newComment, setNewComment] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingContent, setEditingContent] = useState<string>("");
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   const {
     comments,
@@ -55,6 +58,7 @@ export default function ArticleCard(props: ArticleCardProps) {
     fetchComments,
     addComment,
     clearComments,
+    updateComment,
     setComments,
     setOpenCommentsCard,
   } = useCommentStore();
@@ -100,6 +104,31 @@ export default function ArticleCard(props: ArticleCardProps) {
     }
   };
 
+  const handleEditComment = (commentId: string, currentContent: string) => {
+    setEditingCommentId(commentId);
+    setEditingContent(currentContent);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditingContent("");
+  };
+
+  const handleUpdateComment = async (commentId: string) => {
+    if (!editingContent.trim()) return;
+
+    setIsUpdating(true);
+    try {
+      await updateComment(commentId, editingContent.trim());
+      setEditingCommentId(null);
+      setEditingContent("");
+    } catch (error) {
+      console.error("Failed to update comment:", error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   if (props.isLoading) {
     return (
       <Card className="overflow-hidden">
@@ -131,7 +160,7 @@ export default function ArticleCard(props: ArticleCardProps) {
     <Card className="group overflow-hidden bg-white shadow-sm hover:shadow-xl transition-all duration-300 border-0 ring-1 ring-slate-200 hover:ring-slate-300">
       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
         <ImageWithFallback
-          src={props.article?.cover_image_url}
+          src={props.article?.cover_image_url || "/placeholder.svg"}
           validateUrl={true}
           alt={props.article?.title || "Article cover"}
           className="w-full h-48 object-cover rounded-lg"
@@ -338,30 +367,116 @@ export default function ArticleCard(props: ArticleCardProps) {
                                 </span>
                               </div>
                               {comment.user && isAuthenticated && (
-                                <>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={onDeleteOpen}
-                                    className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 flex-shrink-0 ml-2"
-                                    disabled={commentsLoading}
-                                  >
-                                    <Trash className="h-3 w-3" />
-                                  </Button>
-                                  <DeleteCommentModal
-                                    isOpen={isDeleteOpen}
-                                    setIsOpen={onDeleteClose}
-                                    data={{
-                                      commentId: comment.documentId,
-                                      title: props.article?.title ?? "",
-                                    }}
-                                  />
-                                </>
+                                <div className="flex items-center gap-1 ml-2">
+                                  {editingCommentId === comment.documentId ? (
+                                    <>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleUpdateComment(
+                                            comment.documentId
+                                          )
+                                        }
+                                        className="h-6 w-6 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 flex-shrink-0"
+                                        disabled={
+                                          isUpdating || !editingContent.trim()
+                                        }
+                                      >
+                                        {isUpdating ? (
+                                          <Loader2 className="h-3 w-3 animate-spin" />
+                                        ) : (
+                                          <Send className="h-3 w-3" />
+                                        )}
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleCancelEdit}
+                                        className="h-6 w-6 p-0 text-slate-500 hover:text-slate-700 hover:bg-slate-100 flex-shrink-0"
+                                        disabled={isUpdating}
+                                      >
+                                        ×
+                                      </Button>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleEditComment(
+                                            comment.documentId,
+                                            comment.content || ""
+                                          )
+                                        }
+                                        className="h-6 w-6 p-0 text-blue-500 hover:text-blue-700 hover:bg-blue-50 flex-shrink-0"
+                                        disabled={commentsLoading}
+                                      >
+                                        <Pencil className="h-3 w-3" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={onDeleteOpen}
+                                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                                        disabled={commentsLoading}
+                                      >
+                                        <Trash className="h-3 w-3" />
+                                      </Button>
+                                    </>
+                                  )}
+                                </div>
                               )}
                             </div>
-                            <p className="text-sm text-slate-700 break-words">
-                              {comment.content}
-                            </p>
+                            {editingCommentId === comment.documentId ? (
+                              <div className="mt-2">
+                                <Input
+                                  value={editingContent}
+                                  onChange={(e) =>
+                                    setEditingContent(e.target.value)
+                                  }
+                                  className="text-sm bg-white border-slate-200 focus:border-slate-400"
+                                  disabled={isUpdating}
+                                  autoFocus
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" && !e.shiftKey) {
+                                      e.preventDefault();
+                                      handleUpdateComment(comment.documentId);
+                                    } else if (e.key === "Escape") {
+                                      handleCancelEdit();
+                                    }
+                                  }}
+                                />
+                                <div className="text-xs text-slate-500 mt-1">
+                                  Press Enter to save, Escape to cancel
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-slate-700 break-words">
+                                {comment.content}
+                              </p>
+                            )}
+                            {editingCommentId === comment.documentId && (
+                              <DeleteCommentModal
+                                isOpen={isDeleteOpen}
+                                setIsOpen={onDeleteClose}
+                                data={{
+                                  commentId: comment.documentId,
+                                  title: comment.content ?? "",
+                                }}
+                              />
+                            )}
+                            {editingCommentId !== comment.documentId && (
+                              <DeleteCommentModal
+                                isOpen={isDeleteOpen}
+                                setIsOpen={onDeleteClose}
+                                data={{
+                                  commentId: comment.documentId,
+                                  title: comment.content ?? "",
+                                }}
+                              />
+                            )}
                           </div>
                         </div>
                       </div>

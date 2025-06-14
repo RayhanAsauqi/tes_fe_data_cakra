@@ -1,10 +1,11 @@
 import type React from "react";
-import { useState, useEffect } from "react";
-import { Users, Menu, X, Newspaper } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Users, Menu, X, Newspaper, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
 import { AuthStore } from "@/lib/store/auth-store";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 type SidebarItem = {
   icon: React.ElementType;
@@ -27,19 +28,36 @@ type ImprovedSidebarProps = {
   onToggle?: (isOpen: boolean) => void;
 };
 
+const getIsMobile = () => {
+  if (typeof window === "undefined") return false;
+  return window.innerWidth < 768;
+};
+
+const getInitialSidebarState = () => {
+  if (typeof window === "undefined") return false;
+  return !getIsMobile();
+};
+
 export function Sidebar({
   className,
   isOpen: controlledIsOpen,
   onToggle,
 }: ImprovedSidebarProps) {
   const { user, getMe } = AuthStore();
-  const [internalIsOpen, setInternalIsOpen] = useState<boolean>(false);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState(() => getIsMobile());
+  const [internalIsOpen, setInternalIsOpen] = useState(() =>
+    getInitialSidebarState()
+  );
   const location = useLocation();
+  const initialized = useRef(false);
 
   useEffect(() => {
     getMe();
-  }, [getMe]);
+    if (!initialized.current && onToggle) {
+      onToggle(getInitialSidebarState());
+      initialized.current = true;
+    }
+  }, [getMe, onToggle]);
 
   const isOpen =
     controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
@@ -63,27 +81,34 @@ export function Sidebar({
   };
 
   const handleLinkClick = () => {
-    if (isMobile) {
-      handleToggle();
+    if (isMobile && isOpen) {
+      if (controlledIsOpen === undefined) {
+        setInternalIsOpen(false);
+      }
+      onToggle?.(false);
     }
   };
 
   useEffect(() => {
-    const checkScreenSize = () => {
-      const mobile = window.innerWidth < 768;
+    const handleResize = () => {
+      const mobile = getIsMobile();
       setIsMobile(mobile);
-      if (controlledIsOpen === undefined) {
-        setInternalIsOpen(!mobile);
+      if (mobile && controlledIsOpen === undefined) {
+        setInternalIsOpen(false);
+        onToggle?.(false);
       }
     };
 
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [controlledIsOpen, onToggle]);
 
-    return () => {
-      window.removeEventListener("resize", checkScreenSize);
-    };
-  }, [controlledIsOpen]);
+  useEffect(() => {
+    if (isMobile && isOpen && controlledIsOpen === undefined) {
+      setInternalIsOpen(false);
+      onToggle?.(false);
+    }
+  }, [location.pathname, isMobile, isOpen, controlledIsOpen, onToggle]);
 
   return (
     <>
@@ -173,10 +198,13 @@ export function Sidebar({
               <Link
                 to="/auth"
                 className="flex items-center hover:opacity-80 transition"
+                onClick={handleLinkClick}
               >
-                <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center shrink-0">
-                  <Users size={16} />
-                </div>
+                <Avatar className="w-8 h-8 shrink-0">
+                  <AvatarFallback className="bg-slate-600 text-white text-xs">
+                    <User size={16} />
+                  </AvatarFallback>
+                </Avatar>
                 <div className="ml-3 min-w-0">
                   <p className="text-sm font-medium truncate italic text-slate-300">
                     Anonymous
