@@ -1,0 +1,8 @@
+[build]
+  command = "pnpm run build"
+  publish = "dist"  # folder output dari vite build
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
