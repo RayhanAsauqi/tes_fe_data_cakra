@@ -49,7 +49,7 @@ export function Sidebar({
     getInitialSidebarState()
   );
   const location = useLocation();
-  const initialized = useRef(false);
+  const initialized = useRef<boolean>(false);
 
   useEffect(() => {
     getMe();
@@ -226,17 +226,6 @@ export function Sidebar({
           )}
         </div>
       </aside>
-
-      {isMobile && !isOpen && (
-        <Button
-          variant="outline"
-          size="icon"
-          className="fixed left-4 top-4 z-30 bg-white shadow-md md:hidden"
-          onClick={handleToggle}
-        >
-          <Menu size={20} />
-        </Button>
-      )}
     </>
   );
 }

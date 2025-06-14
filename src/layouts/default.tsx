@@ -1,3 +1,4 @@
+
 import { AppHeader } from "@/components/container/header";
 import { Sidebar } from "@/components/container/sidebar";
 import { useState } from "react";
@@ -16,7 +17,7 @@ type DefaultLayoutProps = {
 };
 
 export default function DefaultLayout(props: DefaultLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -25,7 +26,8 @@ export default function DefaultLayout(props: DefaultLayoutProps) {
           sidebarOpen ? "md:ml-64" : "md:ml-16"
         }`}
       >
-        <Sidebar onToggle={setSidebarOpen} />
+        
+        <Sidebar isOpen={sidebarOpen} onToggle={setSidebarOpen} />
         <AppHeader
           title={props.pageTitle}
           subTitle={props.subTitle}
