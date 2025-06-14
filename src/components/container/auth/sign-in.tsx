@@ -1,4 +1,3 @@
-import { useCookies } from "react-cookie";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,8 +13,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AuthStore } from "@/lib/store/auth-store";
 import { SignInFormSchema } from "@/lib/validation/auth";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignInForm() {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const signIn = AuthStore((state) => state.signIn);
   const submitLoading = AuthStore((state) => state.loading);
 
@@ -26,12 +28,11 @@ export default function SignInForm() {
       password: "",
     },
   });
-  // const navigate = useNavigate();
-  const [, setCookie] = useCookies(["token"]);
 
   const submitSignIn = async (values: z.infer<typeof SignInFormSchema>) => {
-    await signIn(values, setCookie);
+    await signIn(values);
   };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submitSignIn)} className="space-y-4">
@@ -56,17 +57,30 @@ export default function SignInForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel htmlFor={field.name}>Password</FormLabel>
-              <Input
-                {...field}
-                id={field.name}
-                placeholder=""
-                type="password"
-              />
+              <div className="relative">
+                <Input
+                  {...field}
+                  id={field.name}
+                  placeholder=""
+                  type={showPassword ? "text" : "password"}
+                />
+                <Button
+                  variant="link"
+                  className="absolute right-1 top-1/2 hover:bg-none -translate-y-1/2"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </Button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={submitLoading}>
+        <Button
+          type="submit"
+          className="w-full bg-slate-800 hover:bg-slate-700 text-white"
+          disabled={submitLoading}
+        >
           Login
         </Button>
       </form>

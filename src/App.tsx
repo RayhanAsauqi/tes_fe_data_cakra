@@ -2,58 +2,44 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { useCookies } from "react-cookie";
 
 import AuthPage from "@/app/auth";
-import ArticlePage from "@/app/article";
 import { ProtectedRoute } from "@/lib/middleware/route-protect";
-import CommentPage from "@/app/comments";
-import ArticleDetailPage from "./app/article/detail";
+
+import ArticleDetailPage from "@/app/articles/detail";
 import NotFoundPage from "@/app/not-found";
+import "@/style/global.css";
+import ArticlePage from "@/app/index";
+import { AuthStore } from "./lib/store/auth-store";
+import { useEffect, useState } from "react";
 
 function App() {
   const [cookies] = useCookies(["token"]);
-  const isAuthenticated = Boolean(cookies.token);
+  const setIsAuthenticated = AuthStore((state) => state.setIsAuthenticated);
+  const isAuthenticated = AuthStore((state) => state.isAuthenticated);
+  const [authReady, setAuthReady] = useState(false);
+
+  useEffect(() => {
+    setIsAuthenticated(!!cookies.token);
+    setAuthReady(true);
+  }, [cookies.token, setIsAuthenticated]);
+  if (!authReady) {
+    return <div className="p-4">Checking authentication...</div>;
+  }
 
   return (
     <Routes>
-      {/* Public Route: only accessible to users who are NOT logged in */}
-      <Route
-        element={
-          isAuthenticated ? (
-            <Navigate to="/articles" replace />
-          ) : (
-            <ProtectedRoute
-              allowAuthenticated={false}
-              isAuthenticated={isAuthenticated}
-            />
-          )
-        }
-      >
-        <Route path="/auth" element={<AuthPage />} />
+      <Route path="/" element={<ArticlePage />} />
+
+      <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+        <Route path="detail/:documentId" element={<ArticleDetailPage />} />
       </Route>
 
-      {/* Private Route: only accessible to users who are logged in */}
       <Route
-        path="/articles"
-        element={
-          <ProtectedRoute
-            allowAuthenticated={true}
-            isAuthenticated={isAuthenticated}
-          />
-        }
-      >
-        <Route index element={<ArticlePage />} />
-        <Route path="detail/:id" element={<ArticleDetailPage />} />
-        <Route path="comments" element={<CommentPage />} />
-      </Route>
-
-      {/* Fallback Route */}
-      <Route
-        path="*"
-        element={
-          isAuthenticated ? <NotFoundPage /> : <Navigate to="/auth" replace />
-        }
+        path="/auth"
+        element={isAuthenticated ? <Navigate to="/" replace /> : <AuthPage />}
       />
+
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
-
 export default App;

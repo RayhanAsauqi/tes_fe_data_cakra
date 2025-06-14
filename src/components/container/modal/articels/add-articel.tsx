@@ -1,7 +1,12 @@
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -29,9 +34,6 @@ import { useArticleStore } from "@/lib/store/article-store";
 import { useArticleCategoryStore } from "@/lib/store/category-store";
 import { ArticleFormValidation } from "@/lib/validation/article";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import type { z } from "zod";
 
 export default function AddArticleModal() {
   const { isOpen, setIsOpen, onClose } = useDisclosure();
@@ -75,7 +77,10 @@ export default function AddArticleModal() {
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(submitForm)} className="space-y-3">
+          <form
+            onSubmit={form.handleSubmit(submitForm)}
+            className="space-y-3  max-h-96 overflow-y-auto"
+          >
             <FormField
               control={form.control}
               name="title"
@@ -159,11 +164,13 @@ export default function AddArticleModal() {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={submitLoading} className="mt-4">
-              Submit
-            </Button>
           </form>
         </Form>
+        <DialogFooter>
+          <Button type="submit" disabled={submitLoading} className="mt-4">
+            Submit
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -1,11 +1,10 @@
-"use client";
-
 import type React from "react";
 import { useState, useEffect } from "react";
-import { Users, Menu, X, MessageCircle, Newspaper } from "lucide-react";
+import { Users, Menu, X, Newspaper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
+import { AuthStore } from "@/lib/store/auth-store";
 
 type SidebarItem = {
   icon: React.ElementType;
@@ -18,45 +17,38 @@ const sidebarItems: SidebarItem[] = [
   {
     icon: Newspaper,
     label: "Articles",
-    href: "/articles",
-    // active: true,
-  },
-  {
-    icon: MessageCircle,
-    label: "Comments",
-    href: "/articles/comments",
+    href: "/",
   },
 ];
 
-interface ImprovedSidebarProps {
+type ImprovedSidebarProps = {
   className?: string;
   isOpen?: boolean;
   onToggle?: (isOpen: boolean) => void;
-}
+};
 
 export function Sidebar({
   className,
   isOpen: controlledIsOpen,
   onToggle,
 }: ImprovedSidebarProps) {
+  const { user, getMe } = AuthStore();
   const [internalIsOpen, setInternalIsOpen] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const location = useLocation();
+
+  useEffect(() => {
+    getMe();
+  }, [getMe]);
 
   const isOpen =
     controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
   const isLinkActive = (href: string) => {
-    if (href === "/articles" && location.pathname === "/articles") {
+    if (href === "/" && location.pathname === "/") {
       return true;
     }
-    if (href !== "/articles" && location.pathname.startsWith(href)) {
-      return true;
-    }
-    if (
-      href === "/articles/comments" &&
-      location.pathname === "/articles/comments"
-    ) {
+    if (href !== "/" && location.pathname.startsWith(href)) {
       return true;
     }
     return false;
@@ -163,15 +155,38 @@ export function Sidebar({
           )}
         >
           {isOpen ? (
-            <div className="flex items-center">
-              <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center shrink-0">
-                <Users size={16} />
+            user ? (
+              <div className="flex items-center">
+                <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center shrink-0">
+                  <Users size={16} />
+                </div>
+                <div className="ml-3 min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {user.username}
+                  </p>
+                  <p className="text-xs text-slate-400 truncate">
+                    {user.email}
+                  </p>
+                </div>
               </div>
-              <div className="ml-3 min-w-0">
-                <p className="text-sm font-medium truncate">John Doe</p>
-                <p className="text-xs text-slate-400 truncate">Admin</p>
-              </div>
-            </div>
+            ) : (
+              <Link
+                to="/auth"
+                className="flex items-center hover:opacity-80 transition"
+              >
+                <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center shrink-0">
+                  <Users size={16} />
+                </div>
+                <div className="ml-3 min-w-0">
+                  <p className="text-sm font-medium truncate italic text-slate-300">
+                    Anonymous
+                  </p>
+                  <p className="text-xs text-slate-500 truncate italic">
+                    Click to login
+                  </p>
+                </div>
+              </Link>
+            )
           ) : (
             !isMobile && (
               <div className="flex justify-center">

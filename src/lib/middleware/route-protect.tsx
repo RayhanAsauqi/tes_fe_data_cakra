@@ -9,7 +9,7 @@ type ProtectedRouteProps = {
 
 export const ProtectedRoute = ({
   isAuthenticated,
-  redirectWhenAuthenticated = "/dashboard/about",
+  redirectWhenAuthenticated = "/",
   redirectWhenUnauthenticated = "/auth",
   allowAuthenticated = true,
 }: ProtectedRouteProps) => {

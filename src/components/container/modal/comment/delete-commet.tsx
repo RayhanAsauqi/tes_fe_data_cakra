@@ -9,27 +9,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useArticleStore } from "@/lib/store/article-store";
+import { useCommentStore } from "@/lib/store/comment-store";
 
 type FormState = {
-  documentId: string;
+  commentId: string;
   title: string;
 };
 
-type DeleteArticleModalProps = {
+type DeleteCommentModalProps = {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   data: FormState;
 };
 
-export default function DeleteArticleModal(props: DeleteArticleModalProps) {
-  const deleteArticle = useArticleStore((state) => state.deleteArticle);
-  const submitLoading = useArticleStore((state) => state.loading);
-
+export default function DeleteCommentModal(props: DeleteCommentModalProps) {
+  const deleteComment = useCommentStore((state) => state.deleteComment);
+  const submitLoading = useCommentStore((state) => state.loading);
   const submitDelete = async () => {
-    await deleteArticle(props.data?.documentId);
-    props.setIsOpen(false);
-    props.data = { documentId: "", title: "" };
+    await deleteComment(props.data.commentId, );
   };
 
   return (
@@ -37,11 +34,11 @@ export default function DeleteArticleModal(props: DeleteArticleModalProps) {
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>
-            <p className="font-bold">Delete Article</p>
+            <p className="font-bold">Delete Comment</p>
           </DialogTitle>
         </DialogHeader>
         <div className="text-red-500 font-semibold">
-          Are you sure you want to delete this article?
+          Are you sure you want to delete this comment?
           <p className="font-bold">{props.data.title}</p>
           <p>this action cannot be undone.</p>
         </div>

@@ -1,7 +1,9 @@
-"use client";
 
-import { Search } from "lucide-react";
+import type React from "react";
 
+import { Menu, Search } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 type SearchProps = {
@@ -19,10 +21,24 @@ interface AppHeaderProps {
 }
 
 export function AppHeader(props: AppHeaderProps) {
+  
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-4">
+          
+          {props.onMenuClick && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={props.onMenuClick}
+            >
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          )}
+
           <div className="flex flex-col">
             <h1 className="text-lg font-semibold text-gray-900">
               {props.title}
@@ -32,9 +48,10 @@ export function AppHeader(props: AppHeaderProps) {
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-[auto_1fr_auto] items-center ">
+
+        <div className="flex items-center gap-4">
           {props.search && (
-            <div className="hidden md:flex flex-1 max-w-md mx-8">
+            <div className="hidden md:flex max-w-md">
               <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <Input
@@ -50,6 +67,20 @@ export function AppHeader(props: AppHeaderProps) {
           {props.button}
         </div>
       </div>
+
+      {props.search && (
+        <div className="md:hidden border-t bg-white/95 backdrop-blur px-4 py-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder={props.search?.placeholder}
+              value={props.search?.value}
+              onChange={(e) => props.search?.onChange?.(e.target.value)}
+              className="pl-10 bg-gray-50 border-gray-200 focus:bg-white"
+            />
+          </div>
+        </div>
+      )}
     </header>
   );
 }
