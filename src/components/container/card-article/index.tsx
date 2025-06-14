@@ -210,7 +210,7 @@ export default function ArticleCard(props: ArticleCardProps) {
               <Link to={`/detail/${props.article.documentId}`}>
                 <Button
                   size="sm"
-                  className="bg-slate-900 hover:bg-slate-800 text-white group/btn"
+                  className="bg-slate-800 hover:bg-slate-700 text-white group/btn"
                 >
                   Read More
                   <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover/btn:translate-x-1" />
@@ -225,7 +225,7 @@ export default function ArticleCard(props: ArticleCardProps) {
             <Link to="/auth">
               <Button
                 size="sm"
-                className="bg-slate-900 hover:bg-slate-800 text-white group/btn"
+                className="bg-slate-800 hover:bg-slate-700 text-white group/btn"
               >
                 Read More
                 <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover/btn:translate-x-1" />

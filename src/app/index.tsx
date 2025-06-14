@@ -32,8 +32,6 @@ export default function ArticlePage() {
   const [debouncedSearch, search, setSearch] = useDebounce("", 800);
 
   useEffect(() => {
-    console.log("🔍 Search query:", debouncedSearch);
-
     fetchArticles(1, 6, debouncedSearch, true);
   }, [debouncedSearch, fetchArticles]);
 
@@ -51,7 +49,9 @@ export default function ArticlePage() {
           <AddArticleModal />
         ) : (
           <Link to="/auth">
-            <Button>Add Article</Button>
+            <Button className="bg-slate-800 hover:bg-slate-700 text-white">
+              Add Article
+            </Button>
           </Link>
         )
       }

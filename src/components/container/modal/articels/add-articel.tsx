@@ -68,7 +68,7 @@ export default function AddArticleModal() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="default">Add Article</Button>
+        <Button variant="default" className="bg-slate-800 hover:bg-slate-700">Add Article</Button>
       </DialogTrigger>
 
       <DialogContent>
