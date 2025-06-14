@@ -82,7 +82,7 @@ export function Pagination({
           size="icon"
           disabled={currentPage === 1}
           onClick={handlePrevious}
-          className="h-9 w-9 rounded-lg border-gray-200"
+          className="h-9 w-9 rounded-lg border-slate-100"
         >
           <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Previous page</span>
@@ -100,7 +100,7 @@ export function Pagination({
               size="icon"
               className={`h-9 w-9 rounded-lg ${
                 page === currentPage
-                  ? "bg-purple-600 hover:bg-purple-700 text-white"
+                  ? "bg-slate-800 hover:bg-slate-700 text-white"
                   : "border-gray-200"
               }`}
               onClick={() => handlePageClick(Number(page))}

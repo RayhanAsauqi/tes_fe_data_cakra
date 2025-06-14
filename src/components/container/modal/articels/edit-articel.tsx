@@ -1,6 +1,18 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
-export default function EditArticleModal() {
+type FormState = {
+  documentId: string;
+  title: string;
+};
+
+type EditArticleModalProps = {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  data: FormState;
+};
+
+export default function EditArticleModal(props: EditArticleModalProps) {
+  console.log("EditArticleModal props:", props);
   return (
     <Dialog>
       <DialogContent>

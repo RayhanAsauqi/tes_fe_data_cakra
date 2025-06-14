@@ -1,4 +1,3 @@
-"use client";
 
 import type React from "react";
 
@@ -27,7 +26,6 @@ export function AppHeader(props: AppHeaderProps) {
     <header className="sticky top-0 z-40 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-4">
-          {/* Hamburger menu button - only visible on mobile */}
           
           {props.onMenuClick && (
             <Button
@@ -52,7 +50,6 @@ export function AppHeader(props: AppHeaderProps) {
         </div>
 
         <div className="flex items-center gap-4">
-          {/* Search - hidden on mobile, shown on desktop */}
           {props.search && (
             <div className="hidden md:flex max-w-md">
               <div className="relative w-full">
@@ -71,7 +68,6 @@ export function AppHeader(props: AppHeaderProps) {
         </div>
       </div>
 
-      {/* Mobile search - shown below header on mobile if search is provided */}
       {props.search && (
         <div className="md:hidden border-t bg-white/95 backdrop-blur px-4 py-3">
           <div className="relative">

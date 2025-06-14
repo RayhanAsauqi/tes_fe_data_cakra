@@ -1,3 +1,5 @@
+import { CircleX, TriangleAlert } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useArticleStore } from "@/lib/store/article-store";
-import { CircleX, TriangleAlert } from "lucide-react";
 
 type FormState = {
   documentId: string;

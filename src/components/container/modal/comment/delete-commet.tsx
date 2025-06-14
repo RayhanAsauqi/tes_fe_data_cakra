@@ -1,3 +1,5 @@
+import { CircleX, TriangleAlert } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useCommentStore } from "@/lib/store/comment-store";
-import { CircleX, TriangleAlert } from "lucide-react";
 
 type FormState = {
   commentId: string;

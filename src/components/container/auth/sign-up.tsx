@@ -13,8 +13,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AuthStore } from "@/lib/store/auth-store";
 import { SignUpFormSchema } from "@/lib/validation/auth";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 export default function SignUpForm() {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const signUp = AuthStore((state) => state.signUp);
   const submitLoading = AuthStore((state) => state.loading);
 
@@ -69,17 +72,30 @@ export default function SignUpForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel htmlFor={field.name}>Password</FormLabel>
-              <Input
-                {...field}
-                id={field.name}
-                placeholder=""
-                type="password"
-              />
+              <div className="relative">
+                <Input
+                  {...field}
+                  id={field.name}
+                  placeholder=""
+                  type={showPassword ? "text" : "password"}
+                />
+                <Button
+                  variant="link"
+                  className="absolute right-1 top-1/2 hover:bg-none -translate-y-1/2"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </Button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={submitLoading}>
+        <Button
+          type="submit"
+          className="w-full bg-slate-800 hover:bg-slate-700"
+          disabled={submitLoading}
+        >
           Login
         </Button>
       </form>

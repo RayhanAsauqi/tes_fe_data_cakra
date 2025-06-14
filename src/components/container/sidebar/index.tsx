@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 import { useState, useEffect } from "react";
 import { Users, Menu, X, Newspaper } from "lucide-react";
@@ -23,11 +21,11 @@ const sidebarItems: SidebarItem[] = [
   },
 ];
 
-interface ImprovedSidebarProps {
+type ImprovedSidebarProps = {
   className?: string;
   isOpen?: boolean;
   onToggle?: (isOpen: boolean) => void;
-}
+};
 
 export function Sidebar({
   className,
@@ -45,7 +43,7 @@ export function Sidebar({
 
   const isOpen =
     controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
-  
+
   const isLinkActive = (href: string) => {
     if (href === "/" && location.pathname === "/") {
       return true;

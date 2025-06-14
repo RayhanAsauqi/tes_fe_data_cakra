@@ -1,6 +1,3 @@
-"use client";
-
-import type React from "react";
 
 import { AppHeader } from "@/components/container/header";
 import { Sidebar } from "@/components/container/sidebar";
