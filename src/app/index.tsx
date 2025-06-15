@@ -12,20 +12,35 @@ import AddArticleModal from "@/components/container/modal/articels/add-articel";
 import { useCookies } from "react-cookie";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import EditArticleModal from "@/components/container/modal/articels/edit-articel";
 
 export default function ArticlePage() {
-  const [cookies] = useCookies(["token"]);
-  const isAuthenticated = Boolean(cookies.token);
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
+  } = useDisclosure();
   const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
     onClose: onDeleteClose,
   } = useDisclosure();
+  const [cookies] = useCookies(["token"]);
+  const isAuthenticated = Boolean(cookies.token);
 
   const [selectedArticle, setSelectedArticle] = useState<{
     documentId: string;
     title: string;
-  }>({ documentId: "", title: "" });
+    description?: string;
+    cover_image_url?: string;
+    category?: number;
+  }>({
+    documentId: "",
+    title: "",
+    description: "",
+    cover_image_url: "",
+    category: 0,
+  });
 
   const { articles, currentPage, totalPages, total, loading, fetchArticles } =
     useArticleStore();
@@ -81,6 +96,16 @@ export default function ArticlePage() {
                     });
                     onDeleteOpen();
                   }}
+                  onEdit={() => {
+                    setSelectedArticle({
+                      documentId: article.documentId,
+                      title: article.title,
+                      description: article.description ?? "",
+                      cover_image_url: article.cover_image_url ?? "",
+                      category: article.category?.id ?? 0,
+                    });
+                    onEditOpen();
+                  }}
                 />
               </div>
             ))}
@@ -103,6 +128,18 @@ export default function ArticlePage() {
         data={{
           documentId: selectedArticle.documentId,
           title: selectedArticle.title,
+        }}
+      />
+
+      <EditArticleModal
+        isOpen={isEditOpen}
+        setIsOpen={onEditClose}
+        data={{
+          documentId: selectedArticle.documentId,
+          title: selectedArticle.title,
+          description: selectedArticle.description ?? "",
+          cover_image_url: selectedArticle.cover_image_url ?? "",
+          category: selectedArticle.category ?? 0,
         }}
       />
     </DefaultLayout>
