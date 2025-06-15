@@ -139,11 +139,6 @@ export function Sidebar({
   };
   const userOptions = [
     {
-      value: "profile",
-      label: "View Profile",
-      icon: User,
-    },
-    {
       value: "logout",
       label: "Logout",
       icon: LogOut,
