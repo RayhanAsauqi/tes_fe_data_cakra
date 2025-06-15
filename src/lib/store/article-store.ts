@@ -23,6 +23,10 @@ type ArticleState = {
 
     createArticle: (data: CreateArticlePayload) => Promise<void>;
     deleteArticle: (documentId: string) => Promise<void>;
+    updateArticle: (
+        documentId: string,
+        data: CreateArticlePayload
+    ) => Promise<void>;
 };
 
 const cookies = new Cookies();
@@ -181,6 +185,41 @@ export const useArticleStore = create<ArticleState>((set, get) => ({
                 error instanceof Error
                     ? error.message
                     : "Failed to create article";
+
+            set({ loading: false, error: errorMessage });
+            toast.error(errorMessage, { position: "bottom-right" });
+        }
+    },
+
+    updateArticle: async (documentId, data) => {
+        set({ loading: true, error: null });
+        const token = cookies.get("token");
+
+        try {
+            const res = await fetch(`${API_URL}/articles/${documentId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${atob(token)}`,
+                },
+                body: JSON.stringify({ data }),
+            });
+
+            if (!res.ok) {
+                throw new Error(`Failed to update article: ${res.status}`);
+            }
+
+            toast.success("Article updated successfully", {
+                position: "bottom-right",
+            });
+
+            const { currentPage } = get();
+            await get().fetchArticles(currentPage);
+        } catch (error) {
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : "Failed to update article";
 
             set({ loading: false, error: errorMessage });
             toast.error(errorMessage, { position: "bottom-right" });

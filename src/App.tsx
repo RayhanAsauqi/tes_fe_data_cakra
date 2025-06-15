@@ -10,6 +10,7 @@ import "@/style/global.css";
 import ArticlePage from "@/app/index";
 import { AuthStore } from "./lib/store/auth-store";
 import { useEffect, useState } from "react";
+import CategoryPage from "./app/category";
 
 function App() {
   const [cookies] = useCookies(["token"]);
@@ -31,6 +32,7 @@ function App() {
 
       <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
         <Route path="detail/:documentId" element={<ArticleDetailPage />} />
+        <Route path="category" element={<CategoryPage />} />
       </Route>
 
       <Route

@@ -33,6 +33,7 @@ interface ArticleCardProps {
   article?: Article;
   isLoading?: boolean;
   onDelete?: () => void;
+  onEdit?: () => void;
 }
 
 export default function ArticleCard(props: ArticleCardProps) {
@@ -236,9 +237,12 @@ export default function ArticleCard(props: ArticleCardProps) {
                   <Trash className="h-4 w-4" />
                 </Button>
               )}
-              <Button variant="outline" size="sm">
-                <Pencil />
-              </Button>
+
+              {props.onEdit && (
+                <Button variant="outline" size="sm" onClick={props.onEdit}>
+                  <Pencil />
+                </Button>
+              )}
 
               <Link to={`/detail/${props.article.documentId}`}>
                 <Button
@@ -274,9 +278,11 @@ export default function ArticleCard(props: ArticleCardProps) {
                   <Trash className="h-4 w-4" />
                 </Button>
               </Link>
-              <Button variant="outline" size="sm">
-                <Pencil />
-              </Button>
+              <Link to="/auth">
+                <Button variant="outline" size="sm">
+                  <Pencil />
+                </Button>
+              </Link>
             </div>
           </div>
         )}

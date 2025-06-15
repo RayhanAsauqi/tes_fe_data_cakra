@@ -1,11 +1,33 @@
 import type React from "react";
 import { useState, useEffect, useRef } from "react";
-import { Users, Menu, X, Newspaper, User } from "lucide-react";
+import {
+  Users,
+  Menu,
+  X,
+  Newspaper,
+  User,
+  LogOut,
+  ChevronsUpDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
 import { AuthStore } from "@/lib/store/auth-store";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 type SidebarItem = {
   icon: React.ElementType;
@@ -45,6 +67,7 @@ export function Sidebar({
 }: ImprovedSidebarProps) {
   const { user, getMe } = AuthStore();
   const [isMobile, setIsMobile] = useState(() => getIsMobile());
+  const [comboboxOpen, setComboboxOpen] = useState(false);
   const [internalIsOpen, setInternalIsOpen] = useState(() =>
     getInitialSidebarState()
   );
@@ -109,6 +132,24 @@ export function Sidebar({
       onToggle?.(false);
     }
   }, [location.pathname, isMobile, isOpen, controlledIsOpen, onToggle]);
+  const handleLogout = () => {
+    AuthStore.getState().clearAuth();
+    setComboboxOpen(false);
+    handleLinkClick();
+  };
+  const userOptions = [
+    {
+      value: "profile",
+      label: "View Profile",
+      icon: User,
+    },
+    {
+      value: "logout",
+      label: "Logout",
+      icon: LogOut,
+      action: handleLogout,
+    },
+  ];
 
   return (
     <>
@@ -181,19 +222,62 @@ export function Sidebar({
         >
           {isOpen ? (
             user ? (
-              <div className="flex items-center">
-                <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center shrink-0">
-                  <Users size={16} />
-                </div>
-                <div className="ml-3 min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    {user.username}
-                  </p>
-                  <p className="text-xs text-slate-400 truncate">
-                    {user.email}
-                  </p>
-                </div>
-              </div>
+              <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    role="combobox"
+                    aria-expanded={comboboxOpen}
+                    className="w-full justify-between h-auto p-2 hover:bg-slate-700 text-white"
+                  >
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center shrink-0">
+                        <Users size={16} />
+                      </div>
+                      <div className="ml-3 min-w-0 text-left">
+                        <p className="text-sm font-medium truncate">
+                          {user.username}
+                        </p>
+                        <p className="text-xs text-slate-400 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-0" align="end">
+                  <Command>
+                    <CommandInput placeholder="Search options..." />
+                    <CommandList>
+                      <CommandEmpty>No options found.</CommandEmpty>
+                      <CommandGroup>
+                        {userOptions.map((option) => (
+                          <CommandItem
+                            key={option.value}
+                            value={option.value}
+                            onSelect={() => {
+                              if (option.action) {
+                                option.action();
+                              } else {
+                                setComboboxOpen(false);
+                              }
+                            }}
+                            className={cn(
+                              "cursor-pointer",
+                              option.value === "logout" &&
+                                "text-red-600 focus:text-red-600"
+                            )}
+                          >
+                            <option.icon className="mr-2 h-4 w-4" />
+                            {option.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             ) : (
               <Link
                 to="/auth"
