@@ -13,14 +13,14 @@ type User = {
 };
 
 export type Category = {
-    id: number;
-    documentId: string;
-    name: string;
-    description: string;
-    createdAt: string;
-    updatedAt: string;
-    publishedAt: string;
-    locale: string | null;
+    id?: number;
+    documentId?: string;
+    name?: string;
+    description?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    publishedAt?: string;
+    locale?: string | null;
 };
 
 type Comment = {

@@ -34,6 +34,8 @@ import { useArticleStore } from "@/lib/store/article-store";
 import { useArticleCategoryStore } from "@/lib/store/category-store";
 import { ArticleFormValidation } from "@/lib/validation/article";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 export default function AddArticleModal() {
   const { isOpen, setIsOpen, onClose } = useDisclosure();
@@ -53,7 +55,7 @@ export default function AddArticleModal() {
   });
 
   useEffect(() => {
-    fetchArticleCategories();
+    fetchArticleCategories(1, 10000);
   }, [fetchArticleCategories]);
 
   const submitForm = async (values: z.infer<typeof ArticleFormValidation>) => {
@@ -73,7 +75,7 @@ export default function AddArticleModal() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Add New Article</DialogTitle>
         </DialogHeader>
@@ -163,6 +165,15 @@ export default function AddArticleModal() {
                       </SelectGroup>
                     </SelectContent>
                   </Select>
+                  <Link to="/category" className="flex justify-end">
+                    <Button
+                      size="sm"
+                      className="bg-slate-900 hover:bg-slate-800 text-white group/btn"
+                    >
+                      <span className="ml-2">add new category</span>
+                      <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover/btn:translate-x-1" />
+                    </Button>
+                  </Link>
                   <FormMessage />
                 </FormItem>
               )}

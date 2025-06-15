@@ -278,9 +278,11 @@ export default function ArticleCard(props: ArticleCardProps) {
                   <Trash className="h-4 w-4" />
                 </Button>
               </Link>
-              <Button variant="outline" size="sm">
-                <Pencil />
-              </Button>
+              <Link to="/auth">
+                <Button variant="outline" size="sm">
+                  <Pencil />
+                </Button>
+              </Link>
             </div>
           </div>
         )}

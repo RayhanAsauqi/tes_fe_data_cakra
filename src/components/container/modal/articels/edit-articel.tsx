@@ -68,7 +68,7 @@ export default function EditArticleModal(props: EditArticleModalProps) {
   useEffect(() => {
     if (props.isOpen && props.data.documentId) {
       fetchArticlesByDocumentId(props.data.documentId);
-      fetchArticleCategories();
+      fetchArticleCategories(1, 10000);
     }
   }, [
     props.isOpen,
