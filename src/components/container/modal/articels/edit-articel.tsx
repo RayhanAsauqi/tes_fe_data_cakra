@@ -100,11 +100,9 @@ export default function EditArticleModal(props: EditArticleModalProps) {
     props.setIsOpen(false);
   };
 
-  console.log("Edit Article Modal", props.data);
-  console.log("selectedArticle", selectedArticle?.category?.id);
   return (
     <Dialog open={props.isOpen} onOpenChange={props.setIsOpen}>
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Edit Article</DialogTitle>
         </DialogHeader>
@@ -176,11 +174,10 @@ export default function EditArticleModal(props: EditArticleModalProps) {
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Categories</SelectLabel>
-                        {articleCategories.map((category) => {
-                          console.log("Category", category.id);
+                        {articleCategories.map((category, index) => {
                           return (
                             <SelectItem
-                              key={selectedArticle?.category.id || category.id}
+                              key={`${category.id}-${index}`}
                               value={category.id.toString()}
                             >
                               {category.name}
